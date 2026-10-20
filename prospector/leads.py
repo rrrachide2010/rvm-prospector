@@ -26,15 +26,27 @@ def tirar_cpf(razao):
 
 
 def telefone(ddd, numero):
-    """(texto formatado, é celular?). Celular no Brasil: 9 dígitos começando com 9."""
+    """(texto formatado, é celular?).
+
+    A Receita guarda quase todo telefone com 8 dígitos, inclusive celular cadastrado antes do nono dígito
+    (base 2026-10 de Sorocaba: 98% com 8 dígitos). Fixo começa com 2 a 5; com 8 dígitos começando com 6 a 9 é
+    celular antigo, e ganha o 9 na frente. Com 9 dígitos, celular começa com 9."""
     ddd = re.sub(r'\D', '', ddd or '')
     num = re.sub(r'\D', '', numero or '')
     if not ddd or len(num) < 8:
         return '', False
     ddd = ddd[-2:]
+    if len(num) == 8 and num[0] in '6789':
+        num = '9' + num
     cel = len(num) == 9 and num.startswith('9')
     fmt = '(%s) %s-%s' % (ddd, num[:-4], num[-4:])
     return fmt, cel
+
+
+def nome_fantasia(bruto):
+    """Limpa o nome fantasia: sem CPF no fim, sem aspas em volta, e vazio quando não tem letra ('***', '000')."""
+    nome = tirar_cpf(bruto).strip().strip('\'"*').strip()
+    return nome if re.search(r'[A-Za-zÀ-ÿ]', nome) else ''
 
 
 def anos_desde(aaaammdd, hoje=None):
@@ -95,7 +107,7 @@ def montar(c, nicho, empresa, simples, cidade, fonte, hoje=None):
     """Lead (dict) a partir dos campos do estabelecimento + dados da empresa e do Simples."""
     razao, natureza, porte = empresa or ('', '', '')
     razao = tirar_cpf(razao)
-    fantasia = c[4].strip()
+    fantasia = nome_fantasia(c[4])
     tel1, cel1 = telefone(c[21], c[22])
     tel2, cel2 = telefone(c[23], c[24])
     cel = tel1 if cel1 else (tel2 if cel2 else '')
@@ -147,8 +159,8 @@ def bloqueado(lead, nao_contatar):
 
 
 def exportar(leads, caminho):
-    """CSV em UTF-8 com BOM (abre certo no Excel), do maior para o menor ponto."""
-    leads = sorted(leads, key=lambda l: (-l['pontos'], l['nome']))
+    """CSV em UTF-8 com BOM (abre certo no Excel): mais pontos primeiro; no empate, o mais antigo."""
+    leads = sorted(leads, key=lambda l: (-l['pontos'], -(l['anos'] or 0), l['nome']))
     with open(caminho, 'w', encoding='utf-8-sig', newline='') as f:
         w = csv.DictWriter(f, fieldnames=COLUNAS, extrasaction='ignore', delimiter=';')
         w.writeheader()
