@@ -51,6 +51,18 @@ class TesteLimpeza(unittest.TestCase):
         self.assertEqual(L.telefone('015', '32345678'), ('(15) 3234-5678', False))
         self.assertEqual(L.telefone('', '32345678'), ('', False))
 
+    def test_celular_de_8_digitos_da_receita_ganha_o_nono(self):
+        self.assertEqual(L.telefone('15', '96916290'), ('(15) 99691-6290', True))
+        self.assertEqual(L.telefone('15', '81140471'), ('(15) 98114-0471', True))
+        self.assertEqual(L.telefone('15', '22345678'), ('(15) 2234-5678', False))
+
+    def test_nome_fantasia_lixo_vira_vazio(self):
+        self.assertEqual(L.nome_fantasia('****'), '')
+        self.assertEqual(L.nome_fantasia('000000000000000000'), '')
+        self.assertEqual(L.nome_fantasia("''A. R. NEURO''"), 'A. R. NEURO')
+        self.assertEqual(L.nome_fantasia('*S&M CONSTRUTORA*'), 'S&M CONSTRUTORA')
+        self.assertEqual(L.nome_fantasia('JOANA FICTICIA 12345678901'), 'JOANA FICTICIA')
+
     def test_campos_rapido_e_com_aspas(self):
         self.assertEqual(R.campos('"a";"b";"c"\r\n'), ['a', 'b', 'c'])
         self.assertEqual(R.campos('"a";"tem ""aspas""";"c"\n'), ['a', 'tem "aspas"', 'c'])
