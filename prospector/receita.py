@@ -18,6 +18,7 @@ import time
 import urllib.request
 import zipfile
 from base64 import b64encode
+from concurrent.futures import ThreadPoolExecutor
 
 TOKEN = 'YggdBLfdninEJX9'
 WEBDAV = 'https://arquivos.receitafederal.gov.br/public.php/webdav/'
@@ -69,6 +70,15 @@ def baixar(mes, nome, pasta, tentativas=6, avisar=print):
             avisar('  %s: conexão caiu (%s), tentativa %d/%d' % (nome, e, n, tentativas))
             time.sleep(min(2 ** n, 30))
     raise RuntimeError('não consegui baixar %s/%s' % (mes, nome))
+
+
+def baixar_em_ordem(mes, nomes, pasta, paralelo=3, avisar=print):
+    """Baixa vários arquivos com `paralelo` conexões e entrega os caminhos na ordem pedida, assim que cada um fica
+    pronto. O servidor da Receita é lento por conexão (~1 MB/s); em paralelo o total cai bastante."""
+    with ThreadPoolExecutor(max_workers=paralelo) as ex:
+        futuros = [ex.submit(baixar, mes, n, pasta, avisar=avisar) for n in nomes]
+        for f in futuros:
+            yield f.result()
 
 
 def linhas(caminho_zip):

@@ -62,10 +62,13 @@ def cmd_cidade(args):
     arq_est, arq_emp, arq_sim = _recorte(mes, uf, cods)
     chaves = ['"%s";"%s"' % (uf, c) for c in cods]  # uf e município são colunas vizinhas: filtro rápido
     basicos, total = set(), 0
+    nomes = (['Estabelecimentos%d.zip' % i for i in range(10)] + ['Empresas%d.zip' % i for i in range(10)]
+             + ['Simples.zip'])
+    arquivos = R.baixar_em_ordem(mes, nomes, DADOS, args.paralelo)
     with open(arq_est + '.parcial', 'w', encoding='utf-8', newline='') as f:
         w = csv.writer(f, delimiter=';')
         for i in range(10):
-            z = R.baixar(mes, 'Estabelecimentos%d.zip' % i, DADOS)
+            z = next(arquivos)
             n = 0
             for linha in R.linhas(z):
                 if any(k in linha for k in chaves):
@@ -82,7 +85,7 @@ def cmd_cidade(args):
 
     empresas = {}
     for i in range(10):
-        z = R.baixar(mes, 'Empresas%d.zip' % i, DADOS)
+        z = next(arquivos)
         for linha in R.linhas(z):
             if linha[1:9] in basicos:
                 c = R.campos(linha)
@@ -94,7 +97,7 @@ def cmd_cidade(args):
         json.dump(empresas, f, ensure_ascii=False)
 
     simples = {}
-    z = R.baixar(mes, 'Simples.zip', DADOS)
+    z = next(arquivos)
     for linha in R.linhas(z):
         if linha[1:9] in basicos:
             c = R.campos(linha)
@@ -179,6 +182,7 @@ def main(argv=None):
     a.add_argument('--municipio', required=True, help='nome como na Receita; vários separados por vírgula')
     a.add_argument('--mes', help='AAAA-MM (padrão: o mais recente)')
     a.add_argument('--manter-zips', action='store_true', help='não apaga os zips depois de ler')
+    a.add_argument('--paralelo', type=int, default=3, help='downloads simultâneos (padrão 3)')
     a.set_defaults(f=cmd_cidade)
 
     a = sub.add_parser('leads', help='filtra o recorte por nicho, pontua e exporta CSV')

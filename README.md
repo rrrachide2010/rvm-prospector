@@ -19,7 +19,7 @@ python -m prospector nichos --conferir
 # 2. Recorte da cidade. Baixa ~7 GB, um arquivo por vez, e apaga cada zip depois de ler.
 #    Roda uma vez por mês de base. Vale para várias cidades de uma vez:
 #    --municipio SOROCABA,VOTORANTIM
-python -m prospector cidade --uf SP --municipio SOROCABA
+python -m prospector cidade --uf SP --municipio SOROCABA   # --paralelo 3 (padrão): o servidor da Receita dá ~1 MB/s por conexão
 
 # 3. Leads, sem rede e em segundos, quantas vezes quiser
 python -m prospector leads --uf SP --municipio SOROCABA --nichos beleza,assistencia --anos-min 2 \
