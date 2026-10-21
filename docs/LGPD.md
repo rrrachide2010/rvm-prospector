@@ -33,6 +33,13 @@ Ser público não dispensa uma base legal para usar o dado em prospecção. A LG
 - **Apague os leads que não viraram conversa** depois de um prazo definido (sugestão: 6 meses). Lista velha só acumula risco.
 - **Não venda nem repasse a lista.** O teste de legítimo interesse foi feito para o seu uso, não para terceiros.
 
+## Setor saúde: cuidados a mais
+
+- **Muitos leads são pessoas.** Psicólogo, nutricionista e fisioterapeuta costumam ter CNPJ em nome próprio, com o celular pessoal. Trate como dado pessoal, com o mesmo cuidado de MEI: uma mensagem por vez, saída na hora.
+- **Prospecção nunca toca dado de paciente.** A lista tem só dados do estabelecimento.
+- **Na implantação, dado de paciente é dado sensível** (LGPD, art. 11). Agenda, WhatsApp e prontuário de visita guardam dado de saúde: faça contrato com cláusula de tratamento de dados, acesso por usuário, backup e servidor no Brasil quando possível.
+- **Cada profissão tem regra de publicidade no seu conselho** (CFM, CFO, COFFITO, CFN, CFP e outros). A oferta da RVM é de atendimento e gestão; não proponha antes e depois, promessa de resultado ou depoimento de paciente nos materiais do cliente sem conferir a regra do conselho dele.
+
 ## Google Places (enriquecimento)
 
 - **Sem chave, nada roda.** A chave fica na variável de ambiente `GOOGLE_PLACES_API_KEY`, nunca no código ou na planilha.

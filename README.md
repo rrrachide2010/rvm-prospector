@@ -22,7 +22,7 @@ python -m prospector nichos --conferir
 python -m prospector cidade --uf SP --municipio SOROCABA   # --paralelo 3 (padrão): o servidor da Receita dá ~1 MB/s por conexão
 
 # 3. Leads, sem rede e em segundos, quantas vezes quiser
-python -m prospector leads --uf SP --municipio SOROCABA --nichos beleza,assistencia --anos-min 2 \
+python -m prospector leads --uf SP --municipio SOROCABA --nichos saude --anos-min 2 \
   --nao-contatar nao-contatar.txt --saida sorocaba.csv
 
 # 4. (Opcional) Google Places nos 50 melhores.
@@ -42,7 +42,6 @@ Saem da tabela "Para quem vender cada sistema" do Kit Proibido (`prospector/nich
 | Chave | Cliente | Sistema |
 |---|---|---|
 | `beleza` | barbearia, salão, estética | Easy!Appointments |
-| `saude` | clínica, consultório | Chatwoot + Easy!Appointments |
 | `assistencia` | assistência técnica, oficina | MapOS |
 | `alimentacao` | restaurante, lanchonete | TastyIgniter |
 | `hospedagem` | pousada, hotel pequeno | QloApps |
@@ -50,6 +49,34 @@ Saem da tabela "Para quem vender cada sistema" do Kit Proibido (`prospector/nich
 | `vendas` | imobiliária | Krayin CRM |
 | `ensino` | escola, treinamento | Moodle |
 | `escritorio` | contabilidade, advocacia | Nextcloud |
+
+### Setor saúde (`--nichos saude`)
+
+`saude` é um setor: traz os 17 nichos abaixo de uma vez (69 CNAEs conferidos na tabela da Receita). Também dá para pedir só alguns, por exemplo `--nichos farmacia,laboratorio,artigos_medicos`.
+
+| Chave | Cliente | Ativos em Sorocaba* |
+|---|---|---|
+| `medico` | clínica médica, consultório | 1.943 |
+| `enfermagem` | enfermagem, home care, remoção | 973 |
+| `psicologia` | psicologia, saúde mental | 695 |
+| `odonto` | odontologia, prótese dentária | 517 |
+| `fisioterapia` | fisioterapia, terapia ocupacional | 323 |
+| `farmacia` | farmácia, manipulação | 305 |
+| `academia` | academia, estúdio de condicionamento físico | 304 |
+| `otica` | ótica | 265 |
+| `integrativas` | práticas integrativas, acupuntura, podologia, outros profissionais | 214 |
+| `hospital` | hospital, pronto atendimento | 193 |
+| `distribuidora_saude` | distribuidora, representante, manutenção de equipamentos médicos | 160 |
+| `diagnostico` | imagem, diagnóstico e terapia especializada | 139 |
+| `artigos_medicos` | loja cirúrgica, ortopédica, aluguel de equipamentos | 136 |
+| `fonoaudiologia` | fonoaudiologia | 135 |
+| `nutricao` | nutrição | 87 |
+| `idosos` | residência geriátrica, cuidado continuado | 86 |
+| `laboratorio` | laboratório de análises | 62 |
+
+\* Base de 10/2026, CNAE principal, abertos há 1 ano ou mais: 6.537 no total, 3.160 com celular.
+
+Ficam de fora: veterinária, planos de saúde e indústria farmacêutica. Cuidados de LGPD e de publicidade dos conselhos de saúde: [docs/LGPD.md](docs/LGPD.md).
 
 Por padrão, só o **CNAE principal** conta. Com `--secundaria`, um CNAE secundário do nicho também conta, o que traz mais leads e mais ruído.
 
