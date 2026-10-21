@@ -125,6 +125,38 @@ class TesteNichos(unittest.TestCase):
         with self.assertRaises(ValueError):
             cnae_para_nicho(['astronautas'])
 
+    def test_setor_saude_cobre_o_universo_pedido(self):
+        mapa = cnae_para_nicho(['saude'])
+        esperado = {
+            '8630503': 'medico',             # consultório médico
+            '8630504': 'odonto',
+            '8640202': 'laboratorio',        # laboratório clínico
+            '4771701': 'farmacia',
+            '4771702': 'farmacia',           # manipulação
+            '4773300': 'artigos_medicos',    # loja cirúrgica e ortopédica
+            '8650004': 'fisioterapia',
+            '8650002': 'nutricao',
+            '8650003': 'psicologia',
+            '8650006': 'fonoaudiologia',
+            '8610101': 'hospital',
+            '8712300': 'enfermagem',         # home care
+            '4645101': 'distribuidora_saude',
+            '4774100': 'otica',
+        }
+        for cnae, nicho in esperado.items():
+            self.assertEqual(mapa.get(cnae), nicho, cnae)
+        self.assertNotIn('4771704', mapa, 'farmácia veterinária fica fora')
+        self.assertNotIn('6550200', mapa, 'plano de saúde fica fora')
+        self.assertNotIn('9602501', mapa, 'beleza não é saúde')
+
+    def test_setor_mistura_com_nicho_sem_repetir(self):
+        from prospector.nichos import SETORES, expandir
+        self.assertEqual(expandir(['beleza', 'saude', 'farmacia'])[:2], ['beleza', SETORES['saude'][0]])
+        self.assertEqual(len(expandir(['saude', 'farmacia'])), len(SETORES['saude']))
+        mapa = cnae_para_nicho(['beleza', 'saude'])
+        self.assertEqual(mapa['9602501'], 'beleza')
+        self.assertEqual(mapa['4773300'], 'artigos_medicos')
+
 
 class TesteFluxoCompleto(unittest.TestCase):
     """cidade + leads de ponta a ponta, com a 'base nacional' falsa em zips locais."""

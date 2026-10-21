@@ -2,7 +2,7 @@
 
   python -m prospector nichos [--conferir]
   python -m prospector cidade  --uf SP --municipio SOROCABA[,VOTORANTIM] [--mes 2026-10]
-  python -m prospector leads   --uf SP --municipio SOROCABA [--nichos beleza,saude] [--anos-min 2] [--saida x.csv]
+  python -m prospector leads   --uf SP --municipio SOROCABA [--nichos saude | --nichos farmacia,laboratorio] [--anos-min 2]
   python -m prospector enriquecer --entrada x.csv --saida y.csv --limite 50 [--campos basico|completo] [--confirmar]
 
 "cidade" varre a base nacional uma vez e guarda só os estabelecimentos ativos da(s) cidade(s), com
@@ -17,7 +17,7 @@ import unicodedata
 
 from . import leads as L
 from . import receita as R
-from .nichos import NICHOS, cnae_para_nicho
+from .nichos import NICHOS, SETORES, cnae_para_nicho, setor_de
 
 DADOS = os.environ.get('PROSPECTOR_DADOS', 'dados')
 
@@ -152,13 +152,16 @@ def cmd_nichos(args):
     cnaes = _ref(_mes(args), 'Cnaes') if args.conferir else {}
     erro = False
     for chave, n in NICHOS.items():
-        print('%-12s %s -> %s' % (chave, n['nome'], n['sistema']))
+        setor = setor_de(chave)
+        print('%-20s %s -> %s%s' % (chave, n['nome'], n['sistema'], ('  [setor %s]' % setor) if setor else ''))
         for c in n['cnaes']:
             desc = cnaes.get(c, '') if args.conferir else ''
             if args.conferir and not desc:
                 erro = True
                 desc = 'NÃO EXISTE NA TABELA DA RECEITA'
-            print('             %s %s' % (c, desc))
+            print('                     %s %s' % (c, desc))
+    for setor, ks in SETORES.items():
+        print('\nsetor %s = %s' % (setor, ','.join(ks)))
     if erro:
         raise SystemExit(1)
 
@@ -189,7 +192,7 @@ def main(argv=None):
     a.add_argument('--uf', required=True)
     a.add_argument('--municipio', required=True)
     a.add_argument('--mes')
-    a.add_argument('--nichos', help='chaves separadas por vírgula (padrão: todos). Ver: prospector nichos')
+    a.add_argument('--nichos', help='chaves ou setores separados por vírgula (padrão: todos). Ex.: saude. Ver: prospector nichos')
     a.add_argument('--anos-min', type=float, default=1)
     a.add_argument('--secundaria', action='store_true', help='aceita CNAE secundário do nicho')
     a.add_argument('--nao-contatar', help='arquivo com CNPJs/telefones que pediram para não ser contatados')
